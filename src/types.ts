@@ -21,6 +21,8 @@
   descImages: string[]
   attributes: { name: string; value: string }[]
   reviewList: Review[]
+  /** false = oculto en la tienda (lo gestiona el panel admin) */
+  active?: boolean
 }
 
 export interface Review {

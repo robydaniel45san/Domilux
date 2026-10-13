@@ -1,4 +1,4 @@
-﻿import { useMemo, useRef, useState, type CSSProperties, type MouseEvent } from 'react'
+import { useMemo, useRef, useState, type CSSProperties, type MouseEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, ChevronDown, ChevronUp, Plus, ShieldCheck, Zap } from 'lucide-react'
 import { Autoplay, EffectCreative, Keyboard } from 'swiper/modules'
@@ -9,6 +9,7 @@ import 'swiper/css/effect-creative'
 import { getProduct, products } from '../data/products'
 import { useStore } from '../context/StoreContext'
 import { colorHex, money } from '../lib'
+import { useSettings } from '../store/settings'
 
 const U = 'https://domilux.shop/wp-content/uploads'
 const DELAY = 6500
@@ -92,6 +93,7 @@ const TOMAS = ['1', '2', '3']
 
 export default function HeroSlider() {
   const { addToCart, openDrawer } = useStore()
+  const { hero } = useSettings()
   const [active, setActive] = useState(0)
   const [color, setColor] = useState('Blanco')
   const [tomas, setTomas] = useState('3')
@@ -135,7 +137,9 @@ export default function HeroSlider() {
         onSwiper={(s) => (swiper.current = s)}
         onSlideChange={(s) => setActive(s.realIndex)}
       >
-        {slides.map((s, i) => {
+        {slides.map((base, i) => {
+          const h = hero[i]
+          const s: Slide = h ? { ...base, kicker: h.kicker, title: [h.title1, h.title2], text: h.text, cta: h.cta } : base
           const product = s.kind === 'switch' ? sw : s.kind === 'lock' ? lock : undefined
           const image = s.kind === 'switch' ? `/cutouts/${sw.slug}.webp` : s.kind === 'lock' ? '/cutouts/cerradura-inteligente.webp' : undefined
           const to = s.kind === 'switch' ? `/producto/${sw.slug}` : s.to

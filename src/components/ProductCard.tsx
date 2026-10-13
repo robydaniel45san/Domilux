@@ -1,4 +1,4 @@
-﻿import { Heart, ShoppingCart, Star } from 'lucide-react'
+import { Heart, ShoppingCart, Star } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import type { Product } from '../types'
 import { money } from '../lib'
@@ -49,9 +49,10 @@ export default function ProductCard({ p }: { p: Product }) {
           addToCart(p.id)
           openDrawer('cart')
         }}
-        className="btn btn-accent mt-3 w-full"
+        disabled={p.stock <= 0}
+        className="btn btn-accent mt-3 w-full disabled:cursor-not-allowed disabled:opacity-50"
       >
-        <ShoppingCart size={16} /> Añadir al carrito
+        <ShoppingCart size={16} /> {p.stock <= 0 ? 'Agotado' : 'Añadir al carrito'}
       </button>
     </div>
   )

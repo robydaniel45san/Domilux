@@ -10,14 +10,16 @@
 }
 
 body { @apply bg-white text-neutral-800 antialiased; }
-.btn { @apply inline-flex items-center justify-center gap-2 rounded px-5 py-2.5 text-sm font-semibold transition-colors cursor-pointer; }
-.btn-primary { @apply bg-brand text-white hover:bg-brand-dark; }
-.btn-accent { @apply bg-accent text-brand-dark hover:bg-accent-dark; }
-.btn-outline { @apply border border-brand text-brand hover:bg-brand hover:text-white; }
-.input { @apply w-full rounded border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-brand focus:ring-1 focus:ring-brand; }
-.no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
-.no-scrollbar::-webkit-scrollbar { display: none; }
-.container-x { @apply mx-auto w-full max-w-7xl px-4; }
+@layer components {
+  .btn { @apply inline-flex items-center justify-center gap-2 rounded px-5 py-2.5 text-sm font-semibold transition-colors cursor-pointer; }
+  .btn-primary { @apply bg-brand text-white hover:bg-brand-dark; }
+  .btn-accent { @apply bg-accent text-brand-dark hover:bg-accent-dark; }
+  .btn-outline { @apply border border-brand text-brand hover:bg-brand hover:text-white; }
+  .input { @apply w-full rounded border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-brand focus:ring-1 focus:ring-brand; }
+  .no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .container-x { @apply mx-auto w-full max-w-7xl px-4; }
+}
 
 /* ---------- Hero inmersivo (Swiper "creative") ---------- */
 .hero-slider { --mx: 0; --my: 0; }
@@ -96,4 +98,11 @@ body { @apply bg-white text-neutral-800 antialiased; }
 @media (prefers-reduced-motion: reduce) {
   .hero-in, .hero-pop, .hero-line, .hero-prod-in { opacity: 1 !important; transform: none !important; animation: none !important; }
   .hero-float, .hero-kenburns, .hero-floor, .hero-spot-dot::after, .hero-spot-line { animation: none !important; }
+}
+
+/* Impresión del comprobante de pedido (panel admin) */
+@media print {
+  body * { visibility: hidden; }
+  #print-area, #print-area * { visibility: visible; }
+  #print-area { position: absolute; left: 0; top: 0; width: 100%; padding: 16px; }
 }

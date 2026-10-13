@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { StoreProvider } from './context/StoreContext'
 import Layout from './components/Layout'
@@ -9,11 +10,16 @@ import Checkout from './pages/Checkout'
 import Wishlist from './pages/Wishlist'
 import Contact from './pages/Contact'
 
+// El panel administrativo se carga solo al entrar a /admin
+const AdminApp = lazy(() => import('./admin/AdminApp'))
+
 export default function App() {
   return (
     <StoreProvider>
       <BrowserRouter>
+        <Suspense fallback={<div className="grid min-h-screen place-items-center text-sm text-neutral-500">Cargando…</div>}>
         <Routes>
+          <Route path="admin/*" element={<AdminApp />} />
           <Route element={<Layout />}>
             <Route index element={<Home />} />
             <Route path="tienda" element={<Shop />} />
@@ -26,6 +32,7 @@ export default function App() {
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         </Routes>
+        </Suspense>
       </BrowserRouter>
     </StoreProvider>
   )

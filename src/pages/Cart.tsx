@@ -6,10 +6,13 @@ import { QtyControl } from '../components/MiniCart'
 import ProductCard from '../components/ProductCard'
 import { useStore } from '../context/StoreContext'
 import { getProductById, products } from '../data/products'
-import { FREE_SHIPPING_FROM, money } from '../lib'
+import { money } from '../lib'
+import { useSettings } from '../store/settings'
 
 export default function Cart() {
-  const { cart, setQty, removeFromCart, subtotal, shipping, total } = useStore()
+  const { cart, setQty, removeFromCart, subtotal, discount, shipping, total, couponCode, applyCoupon, removeCoupon, carrierId, setCarrierId } = useStore()
+  const { shipping: shipCfg } = useSettings()
+  const FREE_SHIPPING_FROM = shipCfg.freeFrom
   const [coupon, setCoupon] = useState('')
   const [couponMsg, setCouponMsg] = useState('')
 
@@ -61,20 +64,45 @@ export default function Cart() {
             })}
           </div>
           <form
-            onSubmit={(e) => { e.preventDefault(); setCouponMsg(coupon ? 'El cupón no es válido (mockup).' : '') }}
+            onSubmit={(e) => {
+              e.preventDefault()
+              if (!coupon.trim()) return
+              const err = applyCoupon(coupon)
+              setCouponMsg(err ?? '')
+              if (!err) setCoupon('')
+            }}
             className="mt-4 flex max-w-sm gap-2"
           >
             <input value={coupon} onChange={(e) => setCoupon(e.target.value)} placeholder="Código de cupón" className="input" />
             <button className="btn btn-outline">Aplicar</button>
           </form>
           {couponMsg && <p className="mt-2 text-sm text-red-600">{couponMsg}</p>}
+          {couponCode && (
+            <p className="mt-2 text-sm text-green-700">
+              Cupón <b>{couponCode}</b> aplicado.{' '}
+              <button onClick={removeCoupon} className="underline cursor-pointer">Quitar</button>
+            </p>
+          )}
           <Link to="/tienda" className="mt-6 inline-block text-sm text-brand underline">← Continuar con la compra</Link>
         </div>
 
         <aside className="h-fit rounded-lg border border-neutral-200 p-5">
           <h2 className="mb-4 font-bold uppercase">Totales del carrito</h2>
+          <div className="mb-4 space-y-2 border-b border-neutral-200 pb-4 text-sm">
+            <p className="font-semibold">Método de envío</p>
+            {shipCfg.carriers.filter((c) => c.active).map((c) => (
+              <label key={c.id} className="flex cursor-pointer items-start gap-2">
+                <input type="radio" name="carrier" className="mt-1" checked={carrierId === c.id} onChange={() => setCarrierId(c.id)} />
+                <span>
+                  {c.name} <span className="text-neutral-500">· {c.eta}</span>
+                  <span className="block text-xs text-neutral-500">{c.price === 0 || subtotal >= FREE_SHIPPING_FROM ? 'Gratis' : money(c.price)}</span>
+                </span>
+              </label>
+            ))}
+          </div>
           <dl className="space-y-3 text-sm">
             <div className="flex justify-between"><dt>Subtotal</dt><dd>{money(subtotal)}</dd></div>
+            {discount > 0 && <div className="flex justify-between text-green-700"><dt>Descuento</dt><dd>-{money(discount)}</dd></div>}
             <div className="flex justify-between"><dt>Envío</dt><dd>{shipping === 0 ? 'Gratis' : money(shipping)}</dd></div>
             <div className="flex justify-between border-t border-neutral-200 pt-3 text-base font-bold"><dt>Total</dt><dd>{money(total)}</dd></div>
           </dl>
